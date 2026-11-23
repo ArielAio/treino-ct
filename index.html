@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Treino CTF</title>
+<!-- ======================================================
+     FASE 1 — você achou um comentário HTML!
+     TODO: remover antes de publicar
+     usuario: admin   senha: olhaocodigo
+     ====================================================== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: direto, de laboratório; um caderno de treino de pentest.
+   IDEA: um "relatório de invasão" com fases numeradas como um placar.
+   PICTURE: o próprio painel de fases com placar no topo.
+   COLOUR/TYPE: papel branco, tinta grafite, teal profundo; Space Grotesk + Inter + mono para códigos.
+   LAYOUT: placar e fases primeiro, depois ferramentas e colas. */
+:root{color-scheme:light dark;--bg:light-dark(#f7f8f6,#0f1416);--card:light-dark(#fff,#162024);--ink:light-dark(#14181a,#e6ecee);--mut:light-dark(#5a666b,#93a3a9);--line:light-dark(#dde3e2,#26343a);--ac:light-dark(#0b5d63,#4fc1c7);--ok:light-dark(#1d7a3a,#5fd08a);--bad:light-dark(#b3261e,#ff8a80);--code:light-dark(#eef3f2,#0b1113)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Space Grotesk",system-ui,sans-serif;line-height:1.1;text-wrap:balance;margin:0 0 .4em}
+h1{font-size:clamp(32px,5vw,48px)}h2{font-size:28px;margin-top:.2em}h3{font-size:19px}
+.band{padding:clamp(24px,4vw,56px) max(5vw,16px)}.wrap{max-width:1180px;margin:auto}
+code,pre,.mono{font-family:"JetBrains Mono",monospace;font-size:14px}code{background:var(--code);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+pre{background:var(--code);padding:12px;border-radius:8px;overflow-x:auto;margin:.5em 0}
+.top{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:end;justify-content:space-between;border-bottom:1px solid var(--line)}
+.score{font-family:"Space Grotesk";font-size:clamp(40px,7vw,64px);font-weight:700;color:var(--ac);line-height:1}
+.score small{font-size:16px;color:var(--mut);font-weight:500;display:block;margin-top:6px}
+.bar{height:8px;background:var(--line);border-radius:9px;overflow:hidden;width:min(320px,80vw);margin-top:10px}.bar i{display:block;height:100%;background:var(--ac);width:0;transition:width .4s}
+nav.scroll{display:flex;gap:8px;overflow-x:auto;padding:12px max(5vw,16px);border-bottom:1px solid var(--line);background:var(--bg)}
+@media(min-width:900px){nav.scroll{position:sticky;top:0;z-index:5}}
+nav a{flex:none;color:var(--ink);text-decoration:none;padding:8px 14px;border:1px solid var(--line);border-radius:99px;font-size:14px}nav a:hover{border-color:var(--ac)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr));gap:16px}
+.lv{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.lv.done{border-color:var(--ok)}.lv header{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.tag{font-size:13px;color:var(--mut)}.lv.done .tag{color:var(--ok);font-weight:600}
+.lv p{margin:0}.cipher{font-family:"JetBrains Mono",monospace;background:var(--code);padding:10px;border-radius:8px;overflow-wrap:anywhere;font-size:15px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+input,textarea,button{font:16px Inter,sans-serif;border-radius:8px;min-height:44px}
+input,textarea{border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:8px 12px;flex:1 1 160px}
+textarea{width:100%;min-height:90px;font-family:"JetBrains Mono",monospace;font-size:15px}
+button{background:var(--ac);color:var(--bg);border:0;padding:8px 16px;font-weight:600;cursor:pointer}
+button.ghost{background:transparent;color:var(--ac);border:1px solid var(--ac)}
+:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.msg{font-size:14px;min-height:1.2em}.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+details{font-size:14px;color:var(--mut)}summary{cursor:pointer;min-height:32px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:24px}
+table{border-collapse:collapse;width:100%;font-size:15px}td,th{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}th{font-family:"Space Grotesk"}
+.out{display:grid;gap:6px;margin-top:12px}.out div{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px}.out b{display:block;font-size:12px;color:var(--mut);font-weight:600}
+.out span{font-family:"JetBrains Mono",monospace;overflow-wrap:anywhere}
+.hid{color:var(--card);font-size:13px;user-select:none}
+ol li,ul li{margin:.3em 0}
+@media(max-width:600px){table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;white-space:normal;color:var(--mut)}.stack td:empty{display:none}}
+@media(prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
+</head>
+<body>
+<section class="band top"><div class="wrap" style="width:100%;display:flex;flex-wrap:wrap;gap:16px 32px;justify-content:space-between;align-items:end">
+  <div style="max-width:640px">
+    <h1>Treino CTF de Segurança</h1>
+    <p style="margin:0;color:var(--mut)">15 fases no formato da prova: a senha de cada uma está escondida nesta própria página ou cifrada. Use Ctrl+U, F12, sites de decodificação e o terminal Linux. Nada aqui é teoria.</p>
+  </div>
+  <div><div class="score"><span id="pts">0</span>/15<small>fases resolvidas</small></div><div class="bar"><i id="barra"></i></div></div>
+</div></section>
+
+<nav class="scroll" aria-label="Seções">
+  <a href="#fases">Fases</a><a href="#decoder">Decodificador</a><a href="#devtools">DevTools</a><a href="#cifras">Reconhecer cifras</a><a href="#linux">Comandos Linux</a><a href="#roteiro">Roteiro da prova</a>
+</nav>
+
+<section class="band" id="fases"><div class="wrap">
+  <h2>Fases</h2>
+  <p style="color:var(--mut);margin-top:0">Dica geral: abra o DevTools (F12) antes de começar. Se o Ctrl+U mostrar outra página, abra este treino em aba própria ou baixe o arquivo .html e abra localmente.</p>
+  <div class="grid" id="grid"></div>
+  <p style="margin-top:20px"><button class="ghost" id="zerar">Zerar progresso</button></p>
+</div></section>
+
+<!-- elemento escondido da Fase 2 -->
+<div style="display:none" id="painel-admin" data-dica="fase2">credenciais de teste -> senha: invisivel42</div>
+<input type="hidden" name="token" value="nao_e_aqui_continue_procurando">
+
+<section class="band" id="decoder" style="background:var(--card);border-block:1px solid var(--line)"><div class="wrap">
+  <h2>Decodificador rápido</h2>
+  <p style="color:var(--mut);margin-top:0">Cole qualquer texto estranho e veja todas as tentativas de uma vez: Base64, Hex, binário, ROT13, todos os deslocamentos de César, Morse, URL. Útil se o CyberChef estiver bloqueado no computador da faculdade.</p>
+  <textarea id="din" placeholder="cole aqui, ex: c2VuaGE="></textarea>
+  <div class="out" id="dout"></div>
+</div></section>
+
+<section class="band" id="devtools"><div class="wrap">
+  <h2>Onde procurar (DevTools e código-fonte)</h2>
+  <table class="stack"><thead><tr><th>Atalho / aba</th><th>O que procurar</th><th>Fase que treina</th></tr></thead><tbody>
+    <tr><td><b>Ctrl+U</b> e depois Ctrl+F</td><td>Busque <code>senha</code>, <code>password</code>, <code>pass</code>, <code>user</code>, <code>login</code>, <code>flag</code>, <code>&lt;!--</code></td><td>1, 4</td></tr>
+    <tr><td><b>Elements</b> (F12)</td><td>Elementos com <code>display:none</code>, <code>type="hidden"</code>, texto da mesma cor do fundo, atributos <code>data-*</code></td><td>2</td></tr>
+    <tr><td><b>Console</b></td><td>Mensagens deixadas pelo professor. Também dá para digitar nomes de variáveis e ver o valor</td><td>3, 4</td></tr>
+    <tr><td><b>Sources</b></td><td>Arquivos .js; procure com Ctrl+Shift+F em todos os arquivos</td><td>4</td></tr>
+    <tr><td><b>Network</b></td><td>Abra ANTES de clicar no botão. Veja URL, parâmetros, cabeçalhos e resposta de cada requisição</td><td>6</td></tr>
+    <tr><td><b>Application</b></td><td>Cookies, Local Storage, Session Storage</td><td>5</td></tr>
+    <tr><td>Ctrl+A na página</td><td>Seleciona tudo e revela texto branco no branco</td><td>bônus</td></tr>
+    <tr><td><code>/robots.txt</code>, <code>/admin</code>, <code>/login</code></td><td>No site real da prova, teste caminhos comuns na URL</td><td>bônus</td></tr>
+  </tbody></table>
+</div></section>
+
+<section class="band" id="cifras" style="background:var(--card);border-block:1px solid var(--line)"><div class="wrap">
+  <h2>Reconhecer a cifra pelo formato</h2>
+  <table class="stack"><thead><tr><th>Aparência</th><th>Provável</th><th>Onde resolver</th></tr></thead><tbody>
+    <tr><td><code>c2VuaGE=</code> letras, números, + / e = no fim</td><td>Base64</td><td>CyberChef "From Base64" · <code>base64 -d</code></td></tr>
+    <tr><td><code>73656e6861</code> só 0-9 e a-f</td><td>Hexadecimal</td><td>CyberChef "From Hex" · <code>xxd -r -p</code></td></tr>
+    <tr><td><code>01110011 01100101</code></td><td>Binário (8 bits = 1 letra)</td><td>CyberChef "From Binary"</td></tr>
+    <tr><td>Palavra legível mas embaralhada, mesmo tamanho</td><td>César / ROT13</td><td>dCode "Caesar" (testa todos) · <code>tr</code></td></tr>
+    <tr><td><code>... .. -. .- .-..</code></td><td>Morse</td><td>dCode / CyberChef "From Morse Code"</td></tr>
+    <tr><td><code>%20</code>, <code>%3D</code></td><td>URL encoding</td><td>CyberChef "URL Decode"</td></tr>
+    <tr><td>32 hex</td><td>Hash MD5</td><td>crackstation.net · <code>md5sum</code> para gerar</td></tr>
+    <tr><td>40 hex / 64 hex</td><td>SHA-1 / SHA-256</td><td>crackstation.net</td></tr>
+    <tr><td>Texto com chave (ex.: "use a chave AULA")</td><td>Vigenère</td><td>dCode "Vigenere"</td></tr>
+  </tbody></table>
+  <p>CyberChef tem a receita <b>Magic</b>, que tenta adivinhar sozinho. Se o resultado ainda parece cifrado, é cifra em camadas: decodifique de novo. Hash não se "descriptografa": procura-se numa tabela de senhas conhecidas.</p>
+  <p class="mono" style="color:var(--mut)">gchq.github.io/CyberChef · dcode.fr · crackstation.net</p>
+</div></section>
+
+<section class="band" id="linux"><div class="wrap">
+  <h2>Comandos Linux que o professor pode pedir</h2>
+  <div class="cols">
+    <div><h3>Decodificar</h3>
+<pre>echo 'c2VuaGE=' | base64 -d         # Base64
+echo 'senha' | base64               # codificar
+echo '73656e6861' | xxd -r -p       # Hex -> texto
+echo 'frauen' | tr 'A-Za-z' 'N-ZA-Mn-za-m'   # ROT13
+echo 'vhqkd' | tr 'd-za-c' 'a-z'    # César -3
+echo -n 'senha123' | md5sum         # gerar MD5
+echo -n 'x' | sha256sum             # gerar SHA-256
+echo 'abc' | rev                    # inverter texto</pre></div>
+    <div><h3>Investigar páginas e arquivos</h3>
+<pre>curl -s http://site/ | grep -i senha   # baixa HTML e filtra
+curl -I http://site/                   # só cabeçalhos
+wget -r http://site/                   # baixa o site todo
+grep -rni 'senha' .                    # procura em pastas
+strings arquivo | grep -i flag         # texto dentro de binário/imagem
+file arquivo                           # descobre o tipo real
+cat .arquivo_oculto ; ls -la           # arquivos com ponto
+exiftool foto.jpg                      # metadados de imagem
+find / -name '*flag*' 2>/dev/null      # caça por nome</pre></div>
+  </div>
+  <p><b>Dicas:</b> <code>-n</code> no echo evita a quebra de linha (muda o hash!). <code>|</code> passa a saída de um comando para o próximo. <code>man comando</code> ou <code>comando --help</code> mostram a ajuda na hora da prova. Se <code>xxd</code> não existir, use <code>python3 -c "print(bytes.fromhex('73656e6861').decode())"</code>.</p>
+</div></section>
+
+<section class="band" id="roteiro" style="background:var(--card);border-top:1px solid var(--line)"><div class="wrap cols">
+  <div><h3>Roteiro para cada fase da prova</h3><ol>
+    <li>Leia o enunciado inteiro: nome de cifra, palavra estranha, título da aba.</li>
+    <li>Ctrl+U e Ctrl+F: <code>senha</code>, <code>pass</code>, <code>user</code>, <code>&lt;!--</code>, <code>flag</code>.</li>
+    <li>F12: Console, Elements, Sources, Application, Network (recarregue com F5 com a aba aberta).</li>
+    <li>Achou algo cifrado? Identifique pela tabela e decodifique. Repita se ainda parecer cifrado.</li>
+    <li>Olhe a URL: parâmetros como <code>?nivel=2</code> às vezes podem ser alterados à mão.</li>
+    <li>Anote cada senha num bloco de notas. Uma fase pode reaproveitar senha anterior.</li>
+  </ol></div>
+  <div><h3>Fase de "adivinhar" credenciais</h3><ul>
+    <li>Do laboratório: <code>aluno / aluno123</code>, <code>aluno / aluno</code>, nome do lab, nome da sala.</li>
+    <li>Padrões: <code>admin/admin</code>, <code>admin/123456</code>, <code>root/root</code>, <code>admin/password</code>, <code>user/user</code>.</li>
+    <li>Contexto do professor: nome dele, da disciplina, da universidade, ano, com e sem <code>@</code> e números.</li>
+    <li>Tela de bloqueio, papel colado no monitor, papel de parede, nome do computador: tudo é pista.</li>
+    <li>Teste variações de maiúscula e o ano atual (2026) no final.</li>
+  </ul></div>
+</div></section>
+
+<script>
+{
+const ESTADO='treino-ctf-v1';
+const fases=[
+ {t:'Comentário escondido',p:'O programador esqueceu algo no código-fonte. Abra com Ctrl+U e procure por <code>&lt;!--</code>.',h:'707121590a57a9a7075370b5526bbb00e6310f4828a0fdfd059ec23114bd6ca9',d:'Fica bem no início do &lt;head&gt;.'},
+ {t:'Elemento invisível',p:'Existe um painel de administração que não aparece na tela. Use F12 &gt; Elements.',h:'b866ad7ff3942c92a08c5c6d54be20dc090d37520ba997f8a817b3bf09d2a916',d:'Procure <code>display:none</code> perto do fim do &lt;body&gt;. Cuidado com a isca no input hidden.'},
+ {t:'O console fala',p:'O professor deixou um recado para quem abre o console.',h:'05b261282c789bd01ce8262d0a570b5e5c956640f6345ffbc4ebdc83f307a0fc',d:'F12 &gt; Console. Recarregue a página se estiver vazio.'},
+ {t:'Variável no JavaScript',p:'Um objeto de configuração no script tem uma senha. Procure no código ou digite o nome dele no console.',h:'b71c3e0dbce58cdba68beb29b769c1bdbdb8976c8e57955d12dff278039223d7',d:'Ctrl+F por <code>cfg</code> no código-fonte; no console digite <code>window.cfg</code>.'},
+ {t:'Guardado no navegador',p:'A senha foi salva no armazenamento do navegador.',h:'e0649855036c4d45ad516a6fafd4c860c805e52b2ee736619c87c0fec589bd60',d:'F12 &gt; Application &gt; Local Storage. Procure a chave <code>flag_fase5</code>.',b:'<p class="msg" id="ls-aviso"></p>'},
+ {t:'Tráfego de rede',p:'Abra F12 &gt; Network e clique no botão de login abaixo. A credencial viaja na requisição.',h:'6597562ea870b1973d735dcfbfd66588346297cc1b9fc2e0a1253ab86e531d75',d:'Clique na requisição <code>login</code> e veja a URL / Payload.',b:'<button class="ghost" id="btnlogin" type="button">Entrar no sistema</button>'},
+ {t:'Base64',p:'Cifra: <b>Base64</b>. Teste no CyberChef ou no terminal: <code>echo ... | base64 -d</code>',c:'ZGVjb2RpZmlxdWVp',h:'3df7452ae41a98d81432d04e67934675bc5cba7c2c0142b2b53c0adcb041de04',d:'O = no fim é típico de Base64 (aqui não tem, e tudo bem).'},
+ {t:'Cifra de César',p:'Cifra: <b>César com deslocamento 3</b>. Use o dCode ou o decodificador desta página.',c:'lpshulrurpdqr',h:'585b657e0ec0d4a8113e1d4d6417f2ac5a23e01fc2c3aee5586c4ce54cfc707c',d:'Volte 3 letras: l→i, p→m, s→p...'},
+ {t:'ROT13 com tr',p:'Cifra: <b>ROT13</b>. Resolva no terminal Linux com <code>tr</code>.',c:'cvathvzyvahk',h:'77c3f5bb3b76364589d544401ac779dac8975f182468469e04e031f816467d97',d:"<code>echo cvathvzyvahk | tr 'a-z' 'n-za-m'</code>"},
+ {t:'Hexadecimal',p:'Cifra: <b>Hex</b>. CyberChef "From Hex" ou <code>xxd -r -p</code>.',c:'63686176655f686578',h:'afa55b76f5d03331f31bd6581d3d775c94e1f0989f3481b3ca4ee296ab260414',d:'Cada par de dígitos é uma letra: 63 = c.'},
+ {t:'Binário',p:'Cifra: <b>binário</b>, 8 bits por caractere.',c:'01111010 01100101 01110010 01101111 00110001',h:'7687f64a2f9e19158997b1bbd9722fd2e942072ba0183f08a32ace85cba79f42',d:'CyberChef "From Binary".'},
+ {t:'Morse',p:'Cifra: <b>código Morse</b>.',c:'... .. -. .- .-..',h:'63b2a5bf1b3f79474819496652c497cb5ccd6110316c0fce20a30eafb544ff95',d:'Responda em minúsculas.'},
+ {t:'Hash MD5',p:'Isto é um <b>hash MD5</b> de uma senha fraca. Hash não volta: consulte uma tabela.',c:'e7d80ffeefa212b7c5c55700e4f7193e',h:'55a5e9e78207b4df8699d60886fa070079463547b095d1a05bc719bb4e6cd251',d:'Cole no crackstation.net. Confirme com <code>echo -n SENHA | md5sum</code>.'},
+ {t:'Cifra em camadas',p:'Sem nome da cifra desta vez. Decodifique até aparecer uma palavra.',c:'NjM2MTZkNjE2NDYxNzM=',h:'84e459f52b88b1124e1b705d03ab805a397a81381ba5e9edb848b0ca30d26555',d:'Primeiro Base64 (tem =), depois o resultado só tem 0-9 e a-f...'},
+ {t:'A cabeça do professor',p:'Última fase: login do "computador do laboratório". Nenhuma pista no código. Pense nas credenciais padrão de um laboratório de faculdade.',h:'38be4e3bd30f7484a2b27faceb210888453b02d701e60ce6cec7b09b755e5f38',d:'Usuário é o que todo estudante é. Senha: o usuário + 123.',u:1}
+];
+window.cfg={servidor:'lab-seg-01',usuario:'prof',senha:'variavel_js',debug:true};
+console.log('%c[Fase 3] Recado do professor: a senha desta fase é console_fala','color:#0b5d63;font-size:15px;font-weight:bold');
+let feitas=[];
+try{feitas=JSON.parse(localStorage.getItem(ESTADO)||'[]')}catch(e){}
+try{localStorage.setItem('flag_fase5','guardado_no_navegador')}catch(e){}
+try{document.cookie='dica=olhe_o_local_storage;path=/'}catch(e){}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+const grid=document.getElementById('grid');
+grid.innerHTML=fases.map((f,i)=>`<article class="lv" id="lv${i}"><header><h3>Fase ${i+1} · ${f.t}</h3><span class="tag" id="tg${i}">0/1</span></header><p>${f.p}</p>${f.c?`<div class="cipher">${esc(f.c)}</div>`:''}${f.b||''}<form class="row" data-i="${i}">${f.u?`<input id="u${i}" placeholder="usuário" autocomplete="off" aria-label="usuário">`:''}<input id="in${i}" placeholder="${f.u?'senha':'senha encontrada'}" autocomplete="off" aria-label="resposta da fase ${i+1}"><button type="submit">Testar</button></form><p class="msg" id="m${i}"></p><details><summary>Dica</summary>${f.d}</details></article>`).join('');
+function pinta(){fases.forEach((f,i)=>{const ok=feitas.includes(i);document.getElementById('lv'+i).classList.toggle('done',ok);document.getElementById('tg'+i).textContent=ok?'resolvida':'pendente'});document.getElementById('pts').textContent=feitas.length;document.getElementById('barra').style.width=(feitas.length/fases.length*100)+'%'}
+grid.addEventListener('submit',async ev=>{ev.preventDefault();const i=+ev.target.dataset.i,f=fases[i],m=document.getElementById('m'+i);let v=document.getElementById('in'+i).value.trim().toLowerCase();if(f.u)v=document.getElementById('u'+i).value.trim().toLowerCase()+':'+v;if(!v){m.textContent='Digite algo.';m.className='msg bad';return}
+ let h;try{h=await sha(v)}catch(e){m.textContent='Navegador sem suporte a verificação. Abra em https ou no Chrome.';m.className='msg bad';return}
+ if(h===f.h){if(!feitas.includes(i))feitas.push(i);try{localStorage.setItem(ESTADO,JSON.stringify(feitas))}catch(e){}m.textContent='Correto! Fase liberada.';m.className='msg ok';pinta()}else{m.textContent='Não é essa. Continue caçando.';m.className='msg bad'}});
+document.getElementById('btnlogin').addEventListener('click',()=>{fetch('./api/login?usuario=bira&senha=trafego_http',{method:'GET'}).catch(()=>{});const m=document.getElementById('m5');m.textContent='Acesso negado (veja o que foi enviado na aba Network).';m.className='msg bad'});
+document.getElementById('zerar').addEventListener('click',()=>{feitas=[];try{localStorage.setItem(ESTADO,'[]')}catch(e){}pinta()});
+try{localStorage.getItem('x')}catch(e){document.getElementById('ls-aviso').textContent='Seu navegador bloqueou o armazenamento aqui; baixe o .html e abra localmente para esta fase.'}
+pinta();
+
+// ---------- decodificador ----------
+const MORSE={'.-':'a','-...':'b','-.-.':'c','-..':'d','.':'e','..-.':'f','--.':'g','....':'h','..':'i','.---':'j','-.-':'k','.-..':'l','--':'m','-.':'n','---':'o','.--.':'p','--.-':'q','.-.':'r','...':'s','-':'t','..-':'u','...-':'v','.--':'w','-..-':'x','-.--':'y','--..':'z','-----':'0','.----':'1','..---':'2','...--':'3','....-':'4','.....':'5','-....':'6','--...':'7','---..':'8','----.':'9'};
+const shift=(s,n)=>s.replace(/[a-z]/gi,c=>{const b=c<='Z'?65:97;return String.fromCharCode((c.charCodeAt(0)-b+n+26)%26+b)});
+const leg=s=>s&&/^[\x20-\x7e\n\r\t]+$/.test(s);
+function tenta(s){const r=[];const t=s.trim();
+ try{const d=new TextDecoder('utf-8',{fatal:true}).decode(Uint8Array.from(atob(t.replace(/\s/g,'')),c=>c.charCodeAt(0)));if(leg(d))r.push(['Base64',d])}catch(e){}
+ if(/^[0-9a-f\s]+$/i.test(t)&&t.replace(/\s/g,'').length%2===0){const d=t.replace(/\s/g,'').match(/../g).map(x=>String.fromCharCode(parseInt(x,16))).join('');if(leg(d))r.push(['Hexadecimal',d])}
+ if(/^[01\s]+$/.test(t)){const d=t.replace(/\s/g,'').match(/.{1,8}/g).map(x=>String.fromCharCode(parseInt(x,2))).join('');if(leg(d))r.push(['Binário',d])}
+ if(/^[.\-\s/]+$/.test(t)){r.push(['Morse',t.split('/').map(w=>w.trim().split(/\s+/).map(c=>MORSE[c]||'?').join('')).join(' ')])}
+ if(/%[0-9a-f]{2}/i.test(t)){try{r.push(['URL decode',decodeURIComponent(t)])}catch(e){}}
+ if(/^[a-f0-9]{32}$/i.test(t))r.push(['Parece hash MD5','Cole no crackstation.net']);
+ if(/^[a-f0-9]{40}$/i.test(t))r.push(['Parece hash SHA-1','Cole no crackstation.net']);
+ if(/^[a-f0-9]{64}$/i.test(t))r.push(['Parece hash SHA-256','Cole no crackstation.net']);
+ if(/[a-z]/i.test(t)){r.push(['ROT13',shift(t,13)]);r.push(['Invertido',[...t].reverse().join('')]);for(let n=1;n<26;n++)if(n!==13)r.push(['César −'+n+' (volta '+n+')',shift(t,-n)])}
+ return r}
+const din=document.getElementById('din'),dout=document.getElementById('dout');
+din.addEventListener('input',()=>{const r=din.value.trim()?tenta(din.value):[];dout.innerHTML=r.length?r.map(([a,b])=>`<div><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join(''):(din.value.trim()?'<div>Nenhum formato reconhecido. Tente o CyberChef (receita Magic).</div>':'')});
+}
+</script>
+</body>
+</html>
